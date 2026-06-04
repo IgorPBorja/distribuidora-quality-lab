@@ -66,9 +66,9 @@ graph TD
 
     subgraph "Observabilidade"
         API --> LOG[Logger Estruturado JSON]
-        API --> METRICS[/metrics - Prometheus]
+        API --> METRICS["/metrics - Prometheus"]
         API --> TRACES[OpenTelemetry Collector]
-        API --> HEALTH[/health - Liveness + Readiness]
+        API --> HEALTH["/health - Liveness + Readiness"]
     end
 
     subgraph "CI/CD Pipeline"
