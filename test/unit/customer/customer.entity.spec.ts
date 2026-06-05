@@ -93,6 +93,12 @@ describe('CustomerEntity', () => {
   });
 
   describe('phone validation', () => {
+    it('when phone is empty, then throws ValidationException', () => {
+      expect(() =>
+        CustomerEntity.create({ ...validProps, phone: null as unknown as string }),
+      ).toThrow(ValidationException);
+    });
+
     it('when phone has fewer than 10 digits, then throws ValidationException', () => {
       expect(() =>
         CustomerEntity.create({ ...validProps, phone: '123456789' }),
@@ -172,6 +178,14 @@ describe('CustomerEntity', () => {
       const customer = CustomerEntity.create(validProps);
 
       expect(() => customer.update({ phone: '123' })).toThrow(
+        ValidationException,
+      );
+    });
+
+    it('when updating phone with empty value, then throws ValidationException', () => {
+      const customer = CustomerEntity.create(validProps);
+
+      expect(() => customer.update({ phone: null as unknown as string })).toThrow(
         ValidationException,
       );
     });
