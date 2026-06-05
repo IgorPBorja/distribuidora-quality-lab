@@ -24,19 +24,19 @@ interface UpdateCustomerProps {
 
 @Entity('customers')
 export class CustomerEntity extends DomainEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
   private _id: string;
 
-  @Column({ length: 150 })
+  @Column({ length: 150, name: 'name' })
   private _name: string;
 
-  @Column({ length: 14 })
+  @Column({ length: 14, name: 'document' })
   private _document: string;
 
-  @Column({ length: 254, unique: true })
+  @Column({ length: 254, unique: true, name: 'email' })
   private _email: string;
 
-  @Column({ length: 11 })
+  @Column({ length: 11, name: 'phone' })
   private _phone: string;
 
   @CreateDateColumn({ name: 'created_at' })
