@@ -149,6 +149,13 @@ export class CustomerEntity extends DomainEntity {
   }
 
   private static validatePhone(phone: string): void {
+    if (!phone) {
+      throw new ValidationException('Invalid phone number format', {
+        field: 'phone',
+        constraint: 'Phone number cannot be empty',
+      });
+    }
+
     const digits = phone.replace(/\D/g, '');
 
     if (digits.length < 10 || digits.length > 11) {
