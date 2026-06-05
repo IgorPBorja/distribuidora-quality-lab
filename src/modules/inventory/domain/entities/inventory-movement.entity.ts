@@ -25,7 +25,7 @@ export class InventoryMovement extends DomainEntity {
   @Column({ type: 'integer' })
   private _quantity: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 255, nullable: true, type: 'varchar' })
   private _reason: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
