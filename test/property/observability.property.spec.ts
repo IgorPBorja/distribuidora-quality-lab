@@ -3,6 +3,11 @@ import { LoggingInterceptor } from '@shared/infrastructure/logging/logging.inter
 import { LoggerService } from '@shared/infrastructure/logging/logger.service';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
+import { NotFoundException } from '@shared/domain/exceptions/not-found.exception';
+import { ValidationException } from '@shared/domain/exceptions/validation.exception';
+import { ConflictException } from '@shared/domain/exceptions/conflict.exception';
+import { BusinessRuleException } from '@shared/domain/exceptions/business-rule.exception';
+import { DomainException } from '@shared/domain/exceptions/domain.exception';
 
 /**
  * Captures stdout writes to inspect emitted log entries.
@@ -76,6 +81,7 @@ function createFakeExecutionContextWithError(
   method: string,
   path: string,
   statusCode: number,
+  error: Error,
 ): { context: ExecutionContext; next: CallHandler } {
   const request = { method, url: path };
   const response = { statusCode };
@@ -94,7 +100,6 @@ function createFakeExecutionContextWithError(
     getType: () => 'http',
   } as unknown as ExecutionContext;
 
-  const error = { status: statusCode, getStatus: () => statusCode };
   const next: CallHandler = {
     handle: () => throwError(() => error),
   };
@@ -116,6 +121,20 @@ const pathArb = fc.stringOf(
   { minLength: 1, maxLength: 50 },
 ).map((s) => '/' + s);
 const statusCodeArb = fc.integer({ min: 100, max: 599 });
+const exceptionArbWithStatusCode = fc.oneof(
+  fc.constantFrom({ statusCode: 400, error: new ValidationException("message", { field: 'field', constraint: 'constraint' }) }),
+  fc.constantFrom({ statusCode: 404, error: new NotFoundException("message", { field: 'field' }) }),
+  fc.constantFrom({ statusCode: 409, error: new ConflictException("message", { field: 'field' }) }),
+  fc.constantFrom({ statusCode: 422, error: new BusinessRuleException("message", { rule: 'rule' }) }),
+  fc.constantFrom({ statusCode: 500, error: new Error("Generic error") as unknown as DomainException }),
+);
+// const exceptionArbWithStatusCode = fc.constantFrom(new Map([
+//   [400, new ValidationException("message", { field: 'field', constraint: 'constraint' })],
+//   [404, new NotFoundException("message", { field: 'field' })],
+//   [409, new ConflictException("message", { field: 'field' })],
+//   [422, new BusinessRuleException("message", { rule: 'rule' })],
+//   [500, new Error("Generic error") as unknown as DomainException],
+// ]));
 
 // --- Property Tests ---
 
@@ -202,12 +221,12 @@ describe('Property Tests — Observability', () => {
         fc.asyncProperty(
           httpMethodArb,
           pathArb,
-          fc.integer({ min: 400, max: 599 }),
-          async (method, path, statusCode) => {
+          exceptionArbWithStatusCode,
+          async (method, path, { statusCode, error }) => {
             // Arrange
             const logger = new LoggerService();
             const interceptor = new LoggingInterceptor(logger);
-            const { context, next } = createFakeExecutionContextWithError(method, path, statusCode);
+            const { context, next } = createFakeExecutionContextWithError(method, path, statusCode, error);
 
             // Act
             const lines = await captureStdoutAsync(async () => {

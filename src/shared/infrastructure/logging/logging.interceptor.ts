@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
 import { LoggerService } from './logger.service';
+import { ExceptionResponseMapper } from '@shared/domain/exceptions/mapper';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -30,9 +31,9 @@ export class LoggingInterceptor implements NestInterceptor {
           });
         },
         error: (error: any) => {
+          const error_response = ExceptionResponseMapper.buildErrorResponse(error);
           const duration_ms = Date.now() - startTime;
-          const status_code =
-            typeof error?.getStatus === 'function' ? error.getStatus() : (error?.status ?? 500);
+          const status_code = error_response.statusCode;
 
           this.logger.logRequest({
             level: 'error',
@@ -40,8 +41,8 @@ export class LoggingInterceptor implements NestInterceptor {
             path,
             status_code,
             duration_ms,
-            message: error?.message,
-            trace: error?.stack,
+            message: error_response.message,
+            trace: error_response.stack,
           });
         },
       }),
