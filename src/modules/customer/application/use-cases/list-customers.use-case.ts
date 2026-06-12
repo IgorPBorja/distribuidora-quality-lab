@@ -3,6 +3,7 @@ import {
   CustomerRepository,
   CUSTOMER_REPOSITORY,
 } from '../../domain/repositories/customer.repository';
+import { LoggerService } from '@shared/infrastructure/logging/logger.service';
 
 export interface CustomerListItem {
   id: string;
@@ -19,6 +20,7 @@ export class ListCustomersUseCase {
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: CustomerRepository,
+    private readonly logger: LoggerService,
   ) {}
 
   async execute(): Promise<CustomerListItem[]> {

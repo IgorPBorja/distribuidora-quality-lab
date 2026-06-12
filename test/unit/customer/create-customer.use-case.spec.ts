@@ -58,6 +58,7 @@ describe('CreateCustomerUseCase', () => {
     useCase = new CreateCustomerUseCase(
       customerRepository,
       validateDocumentUseCase,
+      logger,
     );
   });
 
