@@ -2,14 +2,12 @@ import { CreateCustomerUseCase } from '@modules/customer/application/use-cases/c
 import { CustomerRepository } from '@modules/customer/domain/repositories/customer.repository';
 import { ValidateDocumentUseCase } from '@modules/customer/domain/validate-document.use-case';
 import { CustomerEntity } from '@modules/customer/domain/entities/customer.entity';
-import { LoggerService } from '@shared/infrastructure/logging/logger.service';
 import { ConflictException } from '@shared/domain/exceptions';
 
 describe('CreateCustomerUseCase', () => {
   let useCase: CreateCustomerUseCase;
   let customerRepository: jest.Mocked<CustomerRepository>;
   let validateDocumentUseCase: jest.Mocked<ValidateDocumentUseCase>;
-  let logger: jest.Mocked<LoggerService>;
   let saveSpy: jest.SpyInstance;
   let findByEmailSpy: jest.SpyInstance;
   let validateSpy: jest.SpyInstance;
@@ -42,15 +40,6 @@ describe('CreateCustomerUseCase', () => {
       }),
     } as unknown as jest.Mocked<ValidateDocumentUseCase>;
 
-    logger = {
-      log: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn(),
-      verbose: jest.fn(),
-      logRequest: jest.fn(),
-    } as unknown as jest.Mocked<LoggerService>;
-
     saveSpy = jest.spyOn(customerRepository, 'save');
     findByEmailSpy = jest.spyOn(customerRepository, 'findByEmail');
     validateSpy = jest.spyOn(validateDocumentUseCase, 'execute');
@@ -58,7 +47,6 @@ describe('CreateCustomerUseCase', () => {
     useCase = new CreateCustomerUseCase(
       customerRepository,
       validateDocumentUseCase,
-      logger,
     );
   });
 

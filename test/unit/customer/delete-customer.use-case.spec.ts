@@ -2,12 +2,10 @@ import { DeleteCustomerUseCase } from '@modules/customer/application/use-cases/d
 import { CustomerRepository } from '@modules/customer/domain/repositories/customer.repository';
 import { CustomerEntity } from '@modules/customer/domain/entities/customer.entity';
 import { NotFoundException } from '@shared/domain/exceptions';
-import { LoggerService } from '@shared/infrastructure/logging/logger.service';
 
 describe('DeleteCustomerUseCase', () => {
   let useCase: DeleteCustomerUseCase;
   let customerRepository: jest.Mocked<CustomerRepository>;
-  let logger: jest.Mocked<LoggerService>;
   let deleteSpy: jest.SpyInstance;
   let findByIdSpy: jest.SpyInstance;
   let findByEmailSpy: jest.SpyInstance;
@@ -31,15 +29,6 @@ describe('DeleteCustomerUseCase', () => {
       findAll: jest.fn().mockResolvedValue([]),
       delete: jest.fn().mockResolvedValue(undefined),
     };
-
-    logger = {
-      log: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn(),
-      verbose: jest.fn(),
-      logRequest: jest.fn(),
-    } as unknown as jest.Mocked<LoggerService>;
 
     deleteSpy = jest.spyOn(customerRepository, 'delete');
     findByIdSpy = jest.spyOn(customerRepository, 'findById');

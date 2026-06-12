@@ -29,7 +29,7 @@ export class LoggingInterceptor implements NestInterceptor {
             duration_ms,
           });
         },
-        error: (error: { status?: number; getStatus?: () => number }) => {
+        error: (error: any) => {
           const duration_ms = Date.now() - startTime;
           const status_code =
             typeof error?.getStatus === 'function' ? error.getStatus() : (error?.status ?? 500);
@@ -40,6 +40,8 @@ export class LoggingInterceptor implements NestInterceptor {
             path,
             status_code,
             duration_ms,
+            message: error?.message,
+            trace: error?.stack,
           });
         },
       }),
