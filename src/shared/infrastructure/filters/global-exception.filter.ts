@@ -1,5 +1,6 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { ExceptionResponseMapper } from '@shared/domain/exceptions/mapper';
+import { clsStore } from '@shared/infrastructure/logging/cls.store';
 import { Response } from 'express';
 
 @Catch()
@@ -9,7 +10,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     const errorResponse = ExceptionResponseMapper.buildErrorResponse(exception);
+    const correlationId = clsStore.getStore()?.correlationId;
 
-    response.status(errorResponse.statusCode).json(errorResponse);
+    response.status(errorResponse.statusCode).json({
+      ...errorResponse,
+      ...(correlationId ? { correlation_id: correlationId } : {}),
+    });
   }
 }
