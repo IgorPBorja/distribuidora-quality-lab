@@ -11,8 +11,6 @@ export interface GetCustomerOutput {
   document: string;
   email: string;
   phone: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 @Injectable()
@@ -35,8 +33,6 @@ export class GetCustomerUseCase {
       document: customer.document,
       email: customer.email,
       phone: customer.phone,
-      createdAt: customer.createdAt,
-      updatedAt: customer.updatedAt,
     };
   }
 }
