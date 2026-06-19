@@ -22,6 +22,8 @@ export class CustomerEntity extends DomainEntity {
   document: string;
   email: string;
   phone: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor(
     id: string,
@@ -29,6 +31,8 @@ export class CustomerEntity extends DomainEntity {
     document: string,
     email: string,
     phone: string,
+    createdAt?: Date,
+    updatedAt?: Date,
   ){
     super();
     this.id = id;
@@ -36,6 +40,8 @@ export class CustomerEntity extends DomainEntity {
     this.document = document;
     this.email = email;
     this.phone = phone;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   static create(props: CreateCustomerProps): CustomerEntity {

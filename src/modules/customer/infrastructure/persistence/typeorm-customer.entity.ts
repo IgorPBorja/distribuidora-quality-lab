@@ -78,6 +78,8 @@ export class TypeOrmCustomerEntity extends PersistenceEntity {
         this.document,
         this.email,
         this.phone,
+        this.createdAt,
+        this.updatedAt,
     );
   }
 }

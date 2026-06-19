@@ -20,6 +20,8 @@ export interface CreateCustomerOutput {
   document: string;
   email: string;
   phone: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 @Injectable()
@@ -56,6 +58,8 @@ export class CreateCustomerUseCase {
       document: saved.document,
       email: saved.email,
       phone: saved.phone,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt,
     };
   }
 }
