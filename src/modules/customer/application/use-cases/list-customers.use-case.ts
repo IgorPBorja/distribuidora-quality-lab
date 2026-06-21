@@ -10,8 +10,8 @@ export interface CustomerListItem {
   document: string;
   email: string;
   phone: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 @Injectable()

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { GlobalExceptionFilter } from '@shared/infrastructure/filters/global-exception.filter';
+import { clsStore } from '@shared/infrastructure/logging/cls.store';
 import {
   ValidationException,
   NotFoundException,
@@ -217,6 +218,35 @@ describe('GlobalExceptionFilter', () => {
         // Assert
         const responseBody = mockResponse.json.mock.calls[0][0];
         expect(responseBody.details).toBeUndefined();
+      });
+    });
+
+    describe('correlation ID traceability', () => {
+      it('includes correlation_id in response when set in request context', () => {
+        // Arrange
+        const exception = new NotFoundException('Not found');
+
+        // Act — simulate middleware having stored a correlation ID for this request
+        clsStore.run({ correlationId: 'trace-abc-123' }, () => {
+          filter.catch(exception, mockHost as any);
+        });
+
+        // Assert — client can use this ID to look up the corresponding log entry
+        expect(mockResponse.json).toHaveBeenCalledWith(
+          expect.objectContaining({ correlation_id: 'trace-abc-123' }),
+        );
+      });
+
+      it('omits correlation_id when no request context is active', () => {
+        // Arrange
+        const exception = new NotFoundException('Not found');
+
+        // Act — called outside of a request (e.g. during startup or tests)
+        filter.catch(exception, mockHost as any);
+
+        // Assert
+        const responseBody = mockResponse.json.mock.calls[0][0];
+        expect(responseBody.correlation_id).toBeUndefined();
       });
     });
   });

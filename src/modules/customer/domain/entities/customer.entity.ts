@@ -1,13 +1,7 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
 import { Entity as DomainEntity } from '@shared/domain/entity';
 import { ValidationException } from '@shared/domain/exceptions/validation.exception';
 import { Document } from '../value-objects/document.vo';
+import { randomUUID } from 'crypto';
 
 interface CreateCustomerProps {
   name: string;
@@ -22,55 +16,32 @@ interface UpdateCustomerProps {
   phone?: string;
 }
 
-@Entity('customers')
 export class CustomerEntity extends DomainEntity {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
-  private _id: string;
+  id: string;
+  name: string;
+  document: string;
+  email: string;
+  phone: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
-  @Column({ length: 150, name: 'name' })
-  private _name: string;
-
-  @Column({ length: 14, name: 'document' })
-  private _document: string;
-
-  @Column({ length: 254, unique: true, name: 'email' })
-  private _email: string;
-
-  @Column({ length: 11, name: 'phone' })
-  private _phone: string;
-
-  @CreateDateColumn({ name: 'created_at' })
-  private _createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  private _updatedAt: Date;
-
-  get id(): string {
-    return this._id;
-  }
-
-  get name(): string {
-    return this._name;
-  }
-
-  get document(): string {
-    return this._document;
-  }
-
-  get email(): string {
-    return this._email;
-  }
-
-  get phone(): string {
-    return this._phone;
-  }
-
-  get createdAt(): Date {
-    return this._createdAt;
-  }
-
-  get updatedAt(): Date {
-    return this._updatedAt;
+  constructor(
+    id: string,
+    name: string,
+    document: string,
+    email: string,
+    phone: string,
+    createdAt?: Date,
+    updatedAt?: Date,
+  ){
+    super();
+    this.id = id;
+    this.name = name;
+    this.document = document;
+    this.email = email;
+    this.phone = phone;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   static create(props: CreateCustomerProps): CustomerEntity {
@@ -79,30 +50,32 @@ export class CustomerEntity extends DomainEntity {
     CustomerEntity.validatePhone(props.phone);
 
     const documentVo = Document.create(props.document);
+    const formattedPhone = props.phone.replace(/\D/g, '');
 
-    const customer = new CustomerEntity();
-    customer._name = props.name;
-    customer._document = documentVo.value;
-    customer._email = props.email;
-    customer._phone = props.phone.replace(/\D/g, '');
-
+    const customer = new CustomerEntity(
+      randomUUID(),
+      props.name,
+      documentVo.value,
+      props.email,
+      formattedPhone,
+    );
     return customer;
   }
 
   update(props: UpdateCustomerProps): void {
     if (props.name !== undefined) {
       CustomerEntity.validateName(props.name);
-      this._name = props.name;
+      this.name = props.name;
     }
 
     if (props.email !== undefined) {
       CustomerEntity.validateEmail(props.email);
-      this._email = props.email;
+      this.email = props.email;
     }
 
     if (props.phone !== undefined) {
       CustomerEntity.validatePhone(props.phone);
-      this._phone = props.phone.replace(/\D/g, '');
+      this.phone = props.phone.replace(/\D/g, '');
     }
   }
 
