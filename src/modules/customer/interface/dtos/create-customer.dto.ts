@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, MaxLength, MinLength, Matches } from 'class-validator';
 
 export class CreateCustomerDto {
   @ApiProperty({
@@ -16,10 +16,12 @@ export class CreateCustomerDto {
 
   @ApiProperty({
     description: 'CPF (11 digits) or CNPJ (14 digits)',
-    example: '12345678909',
+    example: '52998224725',
+    pattern: '^\\d{11}$|^\\d{14}$',
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{11}$|^\d{14}$/, { message: 'document must be 11 digits (CPF) or 14 digits (CNPJ)' })
   document: string;
 
   @ApiProperty({
@@ -33,10 +35,15 @@ export class CreateCustomerDto {
   email: string;
 
   @ApiProperty({
-    description: 'Phone number (10 or 11 digits)',
+    description: 'Phone number (10 or 11 digits, digits only)',
     example: '11999887766',
+    minLength: 10,
+    maxLength: 11,
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(11)
+  @Matches(/^\d+$/, { message: 'phone must contain only digits' })
   phone: string;
 }
