@@ -20,6 +20,7 @@ import { UpdateCustomerUseCase } from '../../application/use-cases/update-custom
 import { DeleteCustomerUseCase } from '../../application/use-cases/delete-customer.use-case';
 import { CreateCustomerDto } from '../dtos/create-customer.dto';
 import { UpdateCustomerDto } from '../dtos/update-customer.dto';
+import { CustomerResponseDto } from '../dtos/customer-response.dto';
 
 @ApiTags('customers')
 @Controller('customers')
@@ -36,7 +37,7 @@ export class CustomerController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new customer' })
-  @ApiResponse({ status: 201, description: 'Customer created successfully' })
+  @ApiResponse({ status: 201, type: CustomerResponseDto, description: 'Customer created successfully' })
   @ApiResponse({
     status: 400,
     description: 'Validation error (invalid CPF/CNPJ, name, email, or phone)',
@@ -53,14 +54,14 @@ export class CustomerController {
 
   @Get()
   @ApiOperation({ summary: 'List all customers' })
-  @ApiResponse({ status: 200, description: 'Customers listed successfully' })
+  @ApiResponse({ status: 200, type: CustomerResponseDto, isArray: true, description: 'Customers listed successfully' })
   async findAll() {
     return this.listCustomersUseCase.execute();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get customer by ID' })
-  @ApiResponse({ status: 200, description: 'Customer found' })
+  @ApiResponse({ status: 200, type: CustomerResponseDto, description: 'Customer found' })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.getCustomerUseCase.execute(id);
@@ -68,7 +69,7 @@ export class CustomerController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a customer' })
-  @ApiResponse({ status: 200, description: 'Customer updated successfully' })
+  @ApiResponse({ status: 200, type: CustomerResponseDto, description: 'Customer updated successfully' })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   @ApiResponse({ status: 409, description: 'Email already in use' })
