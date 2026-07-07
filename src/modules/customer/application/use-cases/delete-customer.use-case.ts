@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import {
   CustomerRepository,
   CUSTOMER_REPOSITORY,
@@ -7,6 +7,8 @@ import { NotFoundException } from '@shared/domain/exceptions';
 
 @Injectable()
 export class DeleteCustomerUseCase {
+  private readonly logger = new Logger(DeleteCustomerUseCase.name);
+
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: CustomerRepository,
@@ -20,5 +22,7 @@ export class DeleteCustomerUseCase {
     }
 
     await this.customerRepository.delete(id);
+
+    this.logger.log({ event: 'customer_deleted', customerId: id });
   }
 }

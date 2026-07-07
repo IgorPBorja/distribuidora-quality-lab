@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CustomerEntity } from '../../domain/entities/customer.entity';
 import {
   CustomerRepository,
@@ -26,6 +26,8 @@ export interface CreateCustomerOutput {
 
 @Injectable()
 export class CreateCustomerUseCase {
+  private readonly logger = new Logger(CreateCustomerUseCase.name);
+
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: CustomerRepository,
@@ -51,6 +53,8 @@ export class CreateCustomerUseCase {
     });
 
     const saved = await this.customerRepository.save(customer);
+
+    this.logger.log({ event: 'customer_created', customerId: saved.id });
 
     return {
       id: saved.id,

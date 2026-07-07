@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import {
   CustomerRepository,
   CUSTOMER_REPOSITORY,
@@ -23,6 +23,8 @@ export interface UpdateCustomerOutput {
 
 @Injectable()
 export class UpdateCustomerUseCase {
+  private readonly logger = new Logger(UpdateCustomerUseCase.name);
+
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: CustomerRepository,
@@ -52,6 +54,8 @@ export class UpdateCustomerUseCase {
     });
 
     const saved = await this.customerRepository.save(customer);
+
+    this.logger.log({ event: 'customer_updated', customerId: id });
 
     return {
       id: saved.id,
